@@ -37,7 +37,7 @@ ech=20
 
 G,C = WGAN(data, 300, 2, 6, nb_iterations=it, nb_etapes=et, nb_echantillons=ech)
 
-# evolution of scores and Wassesrstein distance
+# evolution of scores and Wasserstein distance
 graph(G,C)
 
 # creation 
