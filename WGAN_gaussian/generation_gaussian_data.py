@@ -8,26 +8,20 @@ from umap import UMAP
 
 
 #-----------------------------------------------------------
-# creation of initial dataset (from gaussian distribution)
+# initial dataset creation (from gaussian distribution)
 #-----------------------------------------------------------
 
 
-data = pd.DataFrame(columns=np.arange(50)) # 50 variables
-
-## variance of each variable
+## standard deviation of each variable (50 variables)
 std = np.random.uniform(0.2,5,50)
 
 ## 500 individuals from gaussian distribution centered in 0
-for nb_gauss in range(500):
-	new_gauss = pd.DataFrame([np.random.normal(0,std,50)], columns=np.arange(50))
-	data = pd.concat([data,new_gauss])
-
-data.reset_index(drop=True, inplace=True)
+data = pd.DataFrame(np.random.normal(0,std,size=(500,50)), columns=np.arange(50))
 
 
 
 #---------------------------------
-# generation of new individuals
+# new individuals generation
 #---------------------------------
 
 
@@ -35,9 +29,9 @@ it=30000
 et=5
 ech=20
 
-G,C = WGAN(data, 300, 2, 6, nb_iterations=it, nb_etapes=et, nb_echantillons=ech)
+G,C = WGAN(data, 300, 2, 6, nb_iterations=it, nb_step=et, batch_size=ech)
 
-# evolution of scores and Wasserstein distance
+# scores and Wasserstein distance evolution 
 graph(G,C)
 
 # creation 
@@ -48,7 +42,7 @@ cl = pd.Series(['Real']*500+['Fake']*200)
 
 
 #-----------------------------------
-# visualisation of the new dataset
+# new dataset visualization 
 #-----------------------------------
 
 
@@ -59,6 +53,6 @@ plt.figure()
 liste_col = ['crimson','cornflowerblue']
 for color, clas in zip(liste_col, pd.unique(cl)):
 	plt.scatter(df_proj['X1'][df_proj['class']==clas], df_proj['X2'][df_proj['class']==clas], color=color, label=clas, s=15)
-plt.title("UMAP of oversampled data")
+plt.title("oversampled data UMAP")
 plt.legend()
 plt.show()
