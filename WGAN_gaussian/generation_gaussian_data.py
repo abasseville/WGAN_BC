@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
-from fonctions_WGAN import *
+from WGAN_functions import *
 from umap import UMAP
 
 
