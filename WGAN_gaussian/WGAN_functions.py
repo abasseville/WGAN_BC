@@ -13,33 +13,33 @@ c=0.01 # clipping parameter
 size_z=2 # size of the random vector for generator input
 
 
-class Generateur(nn.Module):
+class Generator(nn.Module):
 
 	def __init__(self,p,nb_neur,nb_cc_gen):
 
-		super(Generateur,self).__init__()
+		super(Generator,self).__init__()
 
 		layers = [nn.Linear(size_z,nb_neur), nn.ReLU(inplace=True)]
 		for i in range(nb_cc_gen-1):
 			layers += [nn.Linear(nb_neur,nb_neur), nn.ReLU(inplace=True)]
 		layers += [nn.Linear(nb_neur,p)]
 
-		self.reseau = nn.Sequential(*layers)
+		self.network = nn.Sequential(*layers)
 
 		self.score_fake = []
 		self.optimizer = RMSprop(self.parameters(), lr=pas)
 
 	def forward(self, z):
-		return self.reseau(z)
+		return self.network(z)
 
 
 def groupsort(x):
 	s=list(x.size())
-	nc=s[0]
-	s[0]=-1
-	s.insert(1,nc//2)
+	nc=s[1]
+	s[1]=-1
+	s.insert(2,nc//2)
 	grouped_x = x.view(*s)
-	sorted_grouped_x,_ = grouped_x.sort(dim=1,descending=True)
+	sorted_grouped_x,_ = grouped_x.sort(dim=2,descending=True)
 	sorted_x = sorted_grouped_x.view(*list(x.size()))
 	return sorted_x
 
@@ -52,35 +52,34 @@ class GroupSort(nn.Module):
 		return groupsort(x)
 
 
-class Critique(nn.Module):
+class Critic(nn.Module):
 
 	def __init__(self,p,nb_neur,nb_cc_cri):
 
-		super(Critique,self).__init__()
+		super(Critic,self).__init__()
 
 		layers = [nn.Linear(p,nb_neur), GroupSort()]
 		for i in range(nb_cc_cri-1):
 			layers += [nn.Linear(nb_neur,nb_neur), GroupSort()]
 		layers += [nn.Linear(nb_neur,1)]
 
-		self.reseau = nn.Sequential(*layers)
+		self.network = nn.Sequential(*layers)
 
 		self.score_real = []
 		self.W = []
 		self.optimizer = RMSprop(self.parameters(), lr=pas)
 
 	def forward(self, x):
-		
-		return self.reseau(x)
+		return self.network(x)
 
 
 
-def WGAN(data, nb_neur, nb_cc_gen, nb_cc_cri, nb_iterations, nb_etapes, nb_echantillons):
+def WGAN(data, nb_neur, nb_cc_gen, nb_cc_cri, nb_iterations, nb_step, batch_size):
 
 	n,p=data.shape
 
-	G = Generateur(p,nb_neur,nb_cc_gen)
-	C = Critique(p,nb_neur,nb_cc_cri)
+	G = Generator(p,nb_neur,nb_cc_gen)
+	C = Critic(p,nb_neur,nb_cc_cri)
 
 	i=0
 
@@ -98,15 +97,15 @@ def WGAN(data, nb_neur, nb_cc_gen, nb_cc_cri, nb_iterations, nb_etapes, nb_echan
 		for param in C.parameters():
 			param.requires_grad=True
 
-		for k in range(nb_etapes):
+		for k in range(nb_step):
 
 			C.optimizer.zero_grad()
 
 			for param in C.parameters():
 				param.data.clamp_(-c,c)
 
-			sample_x = Variable(FloatTensor(data.sample(nb_echantillons).values))
-			sample_z = Variable(Normal(0,1).sample((nb_echantillons,size_z)))
+			sample_x = Variable(FloatTensor(data.sample(batch_size).values))
+			sample_z = Variable(Normal(0,1).sample((batch_size,size_z)))
 
 			score_x = mean(C(sample_x))
 			score_z = mean(C(G(sample_z).detach()))
@@ -125,7 +124,7 @@ def WGAN(data, nb_neur, nb_cc_gen, nb_cc_cri, nb_iterations, nb_etapes, nb_echan
 
 		G.optimizer.zero_grad()
 
-		sample_z = Variable(Normal(0,1).sample((nb_echantillons,size_z)))
+		sample_z = Variable(Normal(0,1).sample((batch_size,size_z)))
 		loss_G = -mean(C(G(sample_z)))
 
 		loss_G.backward()
