@@ -6,9 +6,9 @@ We would like to expand our patient cohort by generating it thanks to deep learn
 
 ### WGAN_functions.py :
 We developped the WGAN algorithm with pytorch. It consists of a generator (with ReLU activation function) and a critic (with GroupSort activation function).  
-- *WGAN* function avails optimizing neural networks.  
-- *graph* function avails plot graph of true and fake data scores attributed by the critic as well as the graph of the Wasserstein distance approximation between true and fake data distribution (calculated from scores previously mentioned).  
-- Finally, *create_indiv* function avails generating as data as wanted, thanks to WGAN generator, to be used after the optimizing step.  
+- *WGAN* function allows optimizing neural networks.  
+- *graph* function allows plot graph of true and fake data scores attributed by the critic as well as the graph of the Wasserstein distance approximation between true and fake data distribution (calculated from scores previously mentioned).  
+- Finally, *create_indiv* function allows generating as data as wanted, thanks to WGAN generator, to be used after the optimizing step.  
 
 ### generation_gaussian_data.py :
 1. creation of gaussian dataset
