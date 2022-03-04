@@ -1,7 +1,7 @@
 # WGAN_BC
 
 In this project, we would like to **predict whether a breast cancer patient will relapse or not after treatment**.  
-The problem is that in medicine, data is cruelly lacking : there are many gene measurements but for few patients : this is called the **curse of dimensionality (n<<p)** !  
+The problem is that in medicine, data is cruelly lacking : there are many gene measurements but for few patients, this is called the **curse of dimensionality (n<<p)** !  
 We would like to expand our patient cohort by generating new ones thanks to deep learning tools. We were inspired by **Wasserstein Generative Adversarial Networks** (WGANs) first used to create highly realistic pictures of non-existent people. And we adapted it to suit our health data.  
 
 ### WGAN_functions.py :
